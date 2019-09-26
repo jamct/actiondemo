@@ -11,7 +11,7 @@ jobs:
       - name: Build Docker image
         run: |
           export TAG=${GITHUB_SHA:0:8}
-          docker-compose build
+          docker build
       - name: Push Docker image
         run: |
           export TAG=${GITHUB_SHA:0:8}
