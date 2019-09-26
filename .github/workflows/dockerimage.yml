@@ -4,20 +4,17 @@ on: push
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+    - uses: actions/checkout@master
 
-      - name: Build Docker image
-        run: |
-          export TAG=${GITHUB_SHA:0:8}
-          docker build
-      - name: Push Docker image
-        run: |
-          export TAG=${GITHUB_SHA:0:8}
-          echo "$DOCKER_PASSWORD" | docker login docker.pkg.github.com -u "$DOCKER_USERNAME" --password-stdin
-          docker push
-        if: github.ref == 'refs/heads/master'
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build the Docker container image
+      run: docker build -t docker.pkg.github.com/jamct/actiondemo/app:latest .
+
+    - name: Push the image to GPR
+      run: |
+        docker login docker.pkg.github.com -u publisher -p "${GITHUB_PACKAGE_REGISTRY_TOKEN}"
+        docker push docker.pkg.github.com/jamct/actiondemo/app:latest
+      env:
+        GITHUB_PACKAGE_REGISTRY_TOKEN: ${{ secrets.GITHUB_PACKAGE_REGISTRY_TOKEN }}
